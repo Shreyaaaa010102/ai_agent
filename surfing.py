@@ -1,7 +1,7 @@
 import streamlit as st
 import llm
 import serp
-import helpers1
+import helpers
 
 # Streamlit interface
 st.title("Web Search and Summary")
