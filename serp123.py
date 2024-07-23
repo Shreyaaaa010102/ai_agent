@@ -1,31 +1,62 @@
+
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+from selenium_stealth import stealth
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+import requests
+import json
 
-# Path to your ChromeDriver executable
-chrome_driver_path = "/path/to/chromedriver"  # Update this path
-
-# Set up Chrome options
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-
-# Initialize the ChromeDriver service
-service = Service(chrome_driver_path)
-
-# Start the WebDriver
-driver = webdriver.Chrome(service=service, options=chrome_options)
-
-# Your search function
 def search_google_web_automation(query):
-    driver.get(f"https://www.google.com/search?q={query}")
-    # Perform your search actions here
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("useAutomationExtension", False)
 
-# Example query
+    # Use webdriver_manager to manage ChromeDriver installation
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+
+    stealth(
+        driver,
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+    )
+
+    n_pages = 2
+    results = []
+    counter = 0
+
+    for page in range(1, n_pages):
+        url = f"http://www.google.com/search?q={query}&start={(page - 1) * 10}"
+        
+        driver.get(url)
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        search = soup.find_all("div", class_="yuRUbf")
+        
+        for h in search:
+            counter += 1
+            title = h.a.h3.text
+            link = h.a.get("href")
+            rank = counter
+            results.append({
+                "title": title,
+                "url": link,
+                "domain": urlparse(link).netloc,
+                "rank": rank,
+            })
+
+    driver.quit()
+    return results[:3]
+
+# Example usage
 query = "example search"
-search_google_web_automation(query)
-
-# Close the driver
-driver.quit()
+search_results = search_google_web_automation(query)
+print(json.dumps(search_results, indent=2))
