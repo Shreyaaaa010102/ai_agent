@@ -1,9 +1,9 @@
 #import tiktoken
 
 import newspaper
-from langchain.text_splitter import TokenTextSplitter
+#from langchain.text_splitter import TokenTextSplitter
 import re
-from youtube_transcript_api import YouTubeTranscriptApi
+#from youtube_transcript_api import YouTubeTranscriptApi
 import requests
 from openai import OpenAI
 import os
