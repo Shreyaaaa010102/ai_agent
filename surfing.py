@@ -1,6 +1,6 @@
 import streamlit as st
 import llm
-import serp
+import serp123
 import helpers
 
 # Streamlit interface
@@ -16,7 +16,7 @@ selected_model = "gpt-3.5-turbo"
 if st.button("Search"):
     if query:
         # Search the web for the query
-        search_results = serp.search_google_web_automation(query)
+        search_results = serp123.search_google_web_automation(query)
 
         # Loop through the search results
         for result in search_results:
